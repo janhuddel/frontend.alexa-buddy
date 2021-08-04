@@ -19,29 +19,33 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "home",
   data() {
     return {
       loading: false,
       email: null,
-      authorized: false
+      authorized: false,
     };
   },
   methods: {},
   mounted() {
     this.loading = true;
-    fetch(`http://localhost:8080/user`, {
-      credentials: "include" // fetch won't send cookies unless you set credentials
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.authState === "Authorized") {
-          this.authorized = true;
-          this.email = data.profile.email;
-        }
+
+    axios
+      .get("http://localhost:8080/user", { withCredentials: true })
+      .then((res) => {
+        console.log(res);
+        this.email = res.data.profile.email;
+        this.loading = false;
+        this.authorized = true;
+      })
+      .catch(() => {
+        this.authorized = false;
         this.loading = false;
       });
-  }
+  },
 };
 </script>
